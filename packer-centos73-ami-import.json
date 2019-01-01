@@ -31,24 +31,6 @@
     "destination": "/opt/tmp/10-growpart.cfg"
    },
    {
-     "type": "shell",
-     "inline": "mkdir -p /opt/tmp/packer-puppet-masterless/data",
-     "remote_folder": "/opt/tmp"
-   },
-   {
-     "type": "file",
-     "source": "puppet/hiera/data/",
-     "destination": "/opt/tmp/packer-puppet-masterless/data"
-   },
-   {
-     "type": "puppet-masterless",
-     "puppet_bin_dir": "/opt/puppetlabs/bin",
-     "manifest_file": "puppet/manifests/site.pp",
-     "module_paths": "puppet/modules",
-     "staging_directory": "/opt/tmp/packer-puppet-masterless",
-     "hiera_config_path": "puppet/hiera/lin/hiera.yaml"
-   },
-   {
         "type": "shell",
         "execute_command": "sudo -S sh '{{.Path}}'",
         "remote_folder": "/opt/tmp",
@@ -61,10 +43,6 @@
                   "systemctl enable cloud-init-local.service",
                   "systemctl enable cloud-init.service"
        ]
-   },
-   {
-    "type": "shell-local",
-    "command": "bash test/centos/cis/run.sh"
    },
    {
         "type": "shell",

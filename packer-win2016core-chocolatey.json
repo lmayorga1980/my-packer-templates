@@ -1,0 +1,58 @@
+{
+    "variables": {
+      "admin_user": "Administrator",
+      "security_group_id": "{{env `AWS_SG_ID`}}"
+    },
+    "builders": [ {
+      "type": "amazon-ebs",
+      "ami_name": "LM3_Windows_2016_Core_Chocolatey_Docker_2018_10_11",
+      "instance_type": "t2.medium",
+      "region": "",
+      "secret_key": "",
+      "access_key": "",
+      "ami_description": "LM3 Chocolatey Build",
+      "security_group_id": "{{user `security_group_id`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "LM3_Windows_2016_Core_Base_Docker_????_??_??",
+          "root-device-type": "ebs"
+        },
+       "owners": ["184383867286"],
+       "most_recent": true
+      },
+      "communicator": "winrm",
+      "tags": {
+          "LM3_AMI_Description": "Windows 2016 Core Docker Chocolatey Host",
+          "LM3_Server_Type": "Core",
+          "LM3_OS_Version": "2016",
+          "LM3_OS_Name": "Windows 2016 Core",
+          "LM3_OS_Base_Software": "Ruby, InSpec",
+          "LM3_Docker_Image": "Chocolatey Docker Image with Ruby and Chef Inspec"
+      },
+      "user_data_file": "./ec2-userdata.ps1",
+      "windows_password_timeout": "30m",
+      "winrm_username": "{{user `admin_user`}}",
+      "winrm_use_ssl": true,
+      "winrm_insecure": true
+    }
+    ],
+    "provisioners": [
+    {
+      "type": "windows-shell",
+      "inline": ["docker pull lmayorga1980/wincore-inspec","choco install ruby -y"]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+     "type": "powershell",
+     "inline": [
+            "C:/ProgramData/Amazon/EC2-Windows/Launch/Scripts/InitializeInstance.ps1 -Schedule",
+            "C:/ProgramData/Amazon/EC2-Windows/Launch/Scripts/SysprepInstance.ps1 -NoShutdown"
+              ]
+    }
+
+
+    ]
+}
