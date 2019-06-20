@@ -5,7 +5,7 @@
     },
     "builders": [ {
       "type": "amazon-ebs",
-      "ami_name": "LM3_Windows_2016_Core_Chocolatey_Docker_2018_10_11",
+      "ami_name": "LM3_Windows_2019_Core_Chocolatey_Docker_2019_03_22",
       "instance_type": "t2.medium",
       "region": "",
       "secret_key": "",
@@ -15,7 +15,7 @@
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "LM3_Windows_2016_Core_Base_Docker_????_??_??",
+          "name": "LM3_Windows_2019_Core_Base_Docker_????_??_??",
           "root-device-type": "ebs"
         },
        "owners": ["184383867286"],
@@ -23,10 +23,10 @@
       },
       "communicator": "winrm",
       "tags": {
-          "LM3_AMI_Description": "Windows 2016 Core Docker Chocolatey Host",
+          "LM3_AMI_Description": "Windows 2019 Core Docker Chocolatey Host",
           "LM3_Server_Type": "Core",
-          "LM3_OS_Version": "2016",
-          "LM3_OS_Name": "Windows 2016 Core",
+          "LM3_OS_Version": "2019",
+          "LM3_OS_Name": "Windows 2019 Core",
           "LM3_OS_Base_Software": "Ruby, InSpec",
           "LM3_Docker_Image": "Chocolatey Docker Image with Ruby and Chef Inspec"
       },

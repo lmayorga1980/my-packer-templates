@@ -1,29 +1,25 @@
 {
     "variables": {
       "admin_user": "Administrator",
-      "puppet_release": "enterprise",
-      "pe_version": "2016.4.8",
-      "pe_arch": "x64",
       "security_group_id": "{{env `AWS_SG_ID`}}",
-      "pe_agent_version": "1.10.8",
       "chocolatey_install_url": "{{env `CHOCO_INSTALL_URL`}}",
       "docker_images": "microsoft/windowsservercore",
       "docker_provider": "ee",
-      "docker_version": "18-03-1-ee-3"
+      "docker_version": "18-09-3"
     },
     "builders": [ {
       "type": "amazon-ebs",
-      "ami_name": "LM3_Windows_2016_Core_Base_Docker_2018_09_16",
+      "ami_name": "LM3_Windows_2019_Core_Base_Docker_2019_03_23",
       "instance_type": "t2.medium",
       "region": "",
       "secret_key": "",
       "access_key": "",
-      "ami_description": "LM3 Base AMI with Security Software",
+      "ami_description": "LM3 Windows 2019 Core with Docker",
       "security_group_id": "{{user `security_group_id`}}",
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "Windows_Server-2016-English-Core-Base-????.??.??",
+          "name": "Windows_Server-2019-English-Core-Base-????.??.??",
           "root-device-type": "ebs"
         },
        "owners": ["801119661308"],
@@ -31,10 +27,10 @@
       },
       "communicator": "winrm",
       "tags": {
-          "LM3_AMI_Description": "Windows 2016 Core Docker Host",
+          "LM3_AMI_Description": "Windows 2019 Core Docker Host",
           "LM3_Server_Type": "Core",
-          "LM3_OS_Version": "2016",
-          "LM3_OS_Name": "Windows 2016 Core",
+          "LM3_OS_Version": "2019",
+          "LM3_OS_Name": "Windows 2019 Core",
           "LM3_OS_Base_Software": "Docker, Git, Puppet, Chocolatey"
       },
       "user_data_file": "./ec2-userdata.ps1",
@@ -45,19 +41,6 @@
     }
     ],
     "provisioners": [
-    {
-      "type": "windows-shell",
-      "environment_vars": [ "PUPPET_RELEASE={{user `puppet_release`}}",
-                             "PE_VERSION={{user `pe_version`}}",
-                             "PE_AGENT_VERSION={{user `pe_agent_version`}}",
-                             "PE_ARCH={{user `pe_arch`}}"
-                           ],
-      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
-      "scripts": [
-        "scripts/win/puppet.bat"
-
-      ]
-    },
     {
       "type": "powershell",
       "scripts": [

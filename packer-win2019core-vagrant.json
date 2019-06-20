@@ -7,9 +7,8 @@
       "pe_version": "2016.4.8",
       "pe_arch": "x64",
       "pe_agent_version": "1.10.8",
-      "iso_url": "iso/en_windows_server_2016_x64_dvd_9718492.iso",
-      "iso_checksum": "f185197af68fae4f0e06510a4579fc511ba27616",
-      "aws_s3_bucket_name": "{{env `AWS_S3_BUCKET`}}",
+      "iso_url": "iso/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso",
+      "iso_checksum": "55ac0f541bcc9ce2f70af4227239fc4a6a1e2b6e",
       "chocolatey_install_url": "{{env `CHOCO_INSTALL_URL`}}",
       "vm_version": "1.0",
       "vm_description": "Built with Packer VirtualBox-Iso"
@@ -33,7 +32,7 @@
       "disk_size": 61440,
       "format": "ova",
       "floppy_files": [
-                "http/win/2016/Autounattend.xml",
+                "http/win/2019/Autounattend.xml",
                 "scripts/win/disable-winrm.ps1",
                 "scripts/win/enable-winrm.ps1",
                 "scripts/win/microsoft-updates.bat",
@@ -59,55 +58,42 @@
                            ],
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "scripts/win/puppet.bat"
-
+        "scripts/win/vm-guest-tools.bat"
       ]
+    },
+    {
+      "type": "windows-restart",
+      "restart_check_command": "powershell -command \"& {Write-Output 'restarted.'}\""
     },
     {
       "type": "powershell",
       "environment_vars": [ "CHOCO_INSTALL_URL={{user `chocolatey_install_url`}}",
                             "VAGRANT_USER={{user `vagrant_user`}}"
                           ],
-      "scripts": [ "scripts/win/chocolatey.ps1"
-                 ]
+      "scripts": [ "scripts/win/chocolatey.ps1",
+                   "scripts/win/bitvise.ps1"
+                 ],
+     "valid_exit_codes": [0,16]
     },
     {
-      "type": "puppet-masterless",
-      "manifest_file": "puppet/manifests/site.pp",
-      "module_paths": ["puppet/modules"],
-      "guest_os_type": "windows"
+      "type": "windows-restart"
     },
     {
       "type": "windows-shell",
-      "environment_vars": [ "CHOCO_INSTALL_URL={{user `chocolatey_install_url`}}",
+      "environment_vars": [
                             "VAGRANT_USER={{user `vagrant_user`}}"
                           ],
       "scripts": [
         "scripts/win/uac-enable.bat",
-        "scripts/win/enable-rdp.bat",
-        "scripts/win/compile-dotnet-assemblies.bat"
+        "scripts/win/enable-rdp.bat"
       ]
     }
     ],
    "post-processors" : [
      {
        "type": "vagrant",
-       "keep_input_artifact": true,
-       "output": "windows_2016_{{.Provider}}.box"
-     },
-     {
-       "type": "amazon-import",
-       "only": ["virtualbox-iso"],
-       "access_key": "",
-       "secret_key": "",
-       "region": "",
-       "s3_bucket_name": "{{user `aws_s3_bucket_name`}}",
        "keep_input_artifact": false,
-       "license_type": "BYOL",
-       "tags": 
-        {
-         "Description": "packer amazon-import {{timestamp}}"
-        }
-      }
+       "output": "windows_2019_core_{{.Provider}}.box"
+     }
     ]
 }

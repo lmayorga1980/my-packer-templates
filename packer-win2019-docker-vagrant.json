@@ -3,16 +3,12 @@
       "vagrant_user": "vagrant",
       "vagrant_password": "vagrant",
       "iso_checksum_type": "sha1",
-      "puppet_release": "enterprise",
-      "pe_version": "2016.4.8",
-      "pe_arch": "x64",
-      "pe_agent_version": "1.10.8",
-      "iso_url": "iso/en_windows_server_2019_x64_dvd_4cb967d8.iso",
-      "iso_checksum": "2047f4e9fe2894f138395f3fac037c007dd1493e",
-      "chocolatey_install_url": "{{env `CHOCO_INSTALL_URL`}}",
-      "docker_images": "microsoft/windowsservercore",
+      "iso_url": "iso/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso",
+      "iso_checksum": "55ac0f541bcc9ce2f70af4227239fc4a6a1e2b6e",
+      "chocolatey_install_url": "https://chocolatey.org/install.ps1",
+      "docker_images": "mcr.microsoft.com/windows/servercore:ltsc2019 mcr.microsoft.com/windows/servercore/iis:windowsservercore-ltsc2019 mcr.microsoft.com/dotnet/framework/aspnet:4.8-20190611-windowsservercore-ltsc2019",
       "docker_provider": "ee",
-      "docker_version": "18-03-1-ee-3",
+      "docker_version": "18-09-6",
       "vm_version": "1.0",
       "vm_description": "Built with Packer VirtualBox-Iso"
     },
@@ -29,13 +25,13 @@
       "winrm_timeout": "6h",
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "shutdown_timeout": "1h",
-      "guest_os_type": "Windows2012_64",
+      "guest_os_type": "Windows2016_64",
       "guest_additions_mode": "disable",
-      "output_directory": "packer-win2019gui-virtualbox",
+      "output_directory": "packer-win2019core-virtualbox",
       "disk_size": 61440,
       "format": "ova",
       "floppy_files": [
-                "http/win/2019/Autounattend.xml",
+                "http/win/2019core/Autounattend.xml",
                 "scripts/win/disable-winrm.ps1",
                 "scripts/win/enable-winrm.ps1",
                 "scripts/win/microsoft-updates.bat",
@@ -44,7 +40,7 @@
       "vboxmanage": [
                       ["modifyvm", "{{.Name}}", "--natpf1", "guest_winrm,tcp,,55985,,5985"  ],
                       ["modifyvm", "{{.Name}}", "--vram", "36" ],
-                      ["modifyvm", "{{.Name}}", "--memory", "2048"],
+                      ["modifyvm", "{{.Name}}", "--memory", "8092"],
                       ["modifyvm", "{{.Name}}", "--cpus", "2"],
                       ["modifyvm","{{.Name}}","--vrdeaddress", "0.0.0.0" ],
                       ["modifyvm", "{{.Name}}", "--hardwareuuid", "02f110e7-369a-4bbc-bbe6-6f0b6864ccb6"  ]
@@ -54,15 +50,10 @@
     "provisioners": [
     {
       "type": "windows-shell",
-      "environment_vars": [ "PUPPET_RELEASE={{user `puppet_release`}}",
-                             "PE_VERSION={{user `pe_version`}}",
-                             "PE_AGENT_VERSION={{user `pe_agent_version`}}",
-                             "PE_ARCH={{user `pe_arch`}}"
-                           ],
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "scripts/win/puppet.bat",
-        "scripts/win/vm-guest-tools.bat"
+        "scripts/win/vm-guest-tools.bat",
+        "scripts/win/enable-rdp.bat"
       ]
     },
     {
@@ -78,12 +69,10 @@
     },
     {
       "type": "powershell",
-      "environment_vars": [ "CHOCO_INSTALL_URL={{user `chocolatey_install_url`}}",
+      "environment_vars": [ 
                             "VAGRANT_USER={{user `vagrant_user`}}"
                           ],
-      "scripts": [ "scripts/win/chocolatey.ps1",
-                   "scripts/win/bitvise.ps1"
-                 ],
+      "scripts": [ "scripts/win/chocolatey.ps1"],
      "valid_exit_codes": [0,16]
     },
     {
@@ -105,7 +94,8 @@
         ]
     },
     {
-      "type": "windows-restart"
+      "type": "windows-restart",
+      "restart_check_command": "powershell -command \"& {Write-Output 'restarted.'}\""
     },
     {
       "type": "windows-shell",
@@ -113,10 +103,7 @@
                             "VAGRANT_USER={{user `vagrant_user`}}"
                           ],
       "scripts": [
-        "scripts/win/choco-packs.bat",
-        "scripts/win/uac-enable.bat",
-        "scripts/win/enable-rdp.bat",
-        "scripts/win/compile-dotnet-assemblies.bat"
+        "scripts/win/uac-enable.bat"
       ]
     }
     ],
@@ -124,7 +111,7 @@
      {
        "type": "vagrant",
        "keep_input_artifact": false,
-       "output": "windows_2019_docker_{{.Provider}}.box"
+       "output": "windows_2019_docker_2_{{.Provider}}.box"
      }
     ]
 }
