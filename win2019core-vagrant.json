@@ -6,9 +6,6 @@
       "iso_url": "iso/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso",
       "iso_checksum": "55ac0f541bcc9ce2f70af4227239fc4a6a1e2b6e",
       "chocolatey_install_url": "https://chocolatey.org/install.ps1",
-      "docker_images": "mcr.microsoft.com/windows/servercore:ltsc2019 mcr.microsoft.com/windows/servercore/iis:windowsservercore-ltsc2019 mcr.microsoft.com/dotnet/framework/aspnet:4.8-20190611-windowsservercore-ltsc2019",
-      "docker_provider": "ee",
-      "docker_version": "18-09-6",
       "vm_version": "1.0",
       "vm_description": "Built with Packer VirtualBox-Iso"
     },
@@ -27,7 +24,7 @@
       "shutdown_timeout": "1h",
       "guest_os_type": "Windows2016_64",
       "guest_additions_mode": "disable",
-      "output_directory": "packer-win2019core-virtualbox",
+      "output_directory": "packer-win2019-virtualbox",
       "disk_size": 61440,
       "format": "ova",
       "floppy_files": [
@@ -40,7 +37,7 @@
       "vboxmanage": [
                       ["modifyvm", "{{.Name}}", "--natpf1", "guest_winrm,tcp,,55985,,5985"  ],
                       ["modifyvm", "{{.Name}}", "--vram", "36" ],
-                      ["modifyvm", "{{.Name}}", "--memory", "8092"],
+                      ["modifyvm", "{{.Name}}", "--memory", "2048"],
                       ["modifyvm", "{{.Name}}", "--cpus", "2"],
                       ["modifyvm","{{.Name}}","--vrdeaddress", "0.0.0.0" ],
                       ["modifyvm", "{{.Name}}", "--hardwareuuid", "02f110e7-369a-4bbc-bbe6-6f0b6864ccb6"  ]
@@ -52,50 +49,24 @@
       "type": "windows-shell",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "scripts/win/vm-guest-tools.bat",
-        "scripts/win/enable-rdp.bat"
+        "scripts/win/vm-guest-tools.bat"
       ]
     },
     {
-      "type": "powershell",
-      "scripts": [
-                   "scripts/win/docker/install-containers-feature.ps1"
-                 ],
-      "valid_exit_codes": [0,1]
-    },
-    {
       "type": "windows-restart",
       "restart_check_command": "powershell -command \"& {Write-Output 'restarted.'}\""
     },
     {
       "type": "powershell",
-      "environment_vars": [ 
+      "environment_vars": [ "CHOCO_INSTALL_URL={{user `chocolatey_install_url`}}",
                             "VAGRANT_USER={{user `vagrant_user`}}"
                           ],
-      "scripts": [ "scripts/win/chocolatey.ps1"],
+      "scripts": [ "scripts/win/chocolatey.ps1"
+                ],
      "valid_exit_codes": [0,16]
     },
     {
-       "type": "powershell",
-       "environment_vars": [
-         "docker_images={{user `docker_images`}}",
-         "docker_provider={{user `docker_provider`}}",
-         "docker_version={{user `docker_version`}}"
-        ],
-        "scripts": [
-         "./scripts/win/docker/add-docker-group.ps1",
-         "./scripts/win/docker/install-docker.ps1",
-         "./scripts/win/docker/docker-pull.ps1",
-         "./scripts/win/wait-for-tiworker.ps1",
-         "./scripts/win/docker/open-docker-insecure-port.ps1",
-         "./scripts/win/docker/open-docker-swarm-ports.ps1",
-         "./scripts/win/docker/remove-docker-key-json.ps1",
-         "./scripts/win/docker/disable-windows-defender.ps1"
-        ]
-    },
-    {
-      "type": "windows-restart",
-      "restart_check_command": "powershell -command \"& {Write-Output 'restarted.'}\""
+      "type": "windows-restart"
     },
     {
       "type": "windows-shell",
@@ -103,7 +74,8 @@
                             "VAGRANT_USER={{user `vagrant_user`}}"
                           ],
       "scripts": [
-        "scripts/win/uac-enable.bat"
+        "scripts/win/uac-enable.bat",
+        "scripts/win/enable-rdp.bat"
       ]
     }
     ],
@@ -111,7 +83,7 @@
      {
        "type": "vagrant",
        "keep_input_artifact": false,
-       "output": "windows_2019_docker_2_{{.Provider}}.box"
+       "output": "windows_2019_core_{{.Provider}}.box"
      }
     ]
 }
