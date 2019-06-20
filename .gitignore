@@ -4,7 +4,6 @@ iso/
 iso
 Gemfile.lock
 log/
-http/win/**/Autounattend.xml
 puppet/modules
 packer-centos73-x86_64-virtualbox/
 packer-centos73-x86_64-vmware/
