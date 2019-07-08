@@ -1,0 +1,89 @@
+{
+    "variables": {
+      "vagrant_user": "vagrant",
+      "vagrant_password": "vagrant",
+      "iso_checksum_type": "sha1",
+      "iso_url": "iso/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso",
+      "iso_checksum": "55ac0f541bcc9ce2f70af4227239fc4a6a1e2b6e",
+      "chocolatey_install_url": "https://chocolatey.org/install.ps1",
+      "vm_version": "1.0",
+      "vm_description": "Built with Packer VirtualBox-Iso"
+    },
+    "builders": [ {
+      "type": "virtualbox-iso",
+      "communicator": "winrm",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "headless": true,
+      "boot_wait": "3m",
+      "winrm_username": "{{user `vagrant_user`}}",
+      "winrm_password": "{{user `vagrant_password`}}",
+      "winrm_timeout": "6h",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "shutdown_timeout": "1h",
+      "guest_os_type": "Windows2016_64",
+      "guest_additions_mode": "disable",
+      "output_directory": "packer-win2019-virtualbox",
+      "disk_size": 61440,
+      "format": "ova",
+      "floppy_files": [
+                "http/win/2019/Autounattend.xml",
+                "scripts/win/disable-winrm.ps1",
+                "scripts/win/enable-winrm.ps1",
+                "scripts/win/microsoft-updates.bat",
+                "scripts/win/win-updates.ps1"
+            ],
+      "vboxmanage": [
+                      ["modifyvm", "{{.Name}}", "--natpf1", "guest_winrm,tcp,,55985,,5985"  ],
+                      ["modifyvm", "{{.Name}}", "--vram", "36" ],
+                      ["modifyvm", "{{.Name}}", "--memory", "4096"],
+                      ["modifyvm", "{{.Name}}", "--cpus", "2"],
+                      ["modifyvm","{{.Name}}","--vrdeaddress", "0.0.0.0" ],
+                      ["modifyvm", "{{.Name}}", "--hardwareuuid", "02f110e7-369a-4bbc-bbe6-6f0b6864ccb6"  ]
+                    ]
+        }
+    ],
+    "provisioners": [
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "scripts/win/vm-guest-tools.bat"
+      ]
+    },
+    {
+      "type": "windows-restart",
+      "restart_check_command": "powershell -command \"& {Write-Output 'restarted.'}\""
+    },
+    {
+      "type": "powershell",
+      "environment_vars": [ "CHOCO_INSTALL_URL={{user `chocolatey_install_url`}}",
+                            "VAGRANT_USER={{user `vagrant_user`}}"
+                          ],
+      "scripts": [ "scripts/win/chocolatey.ps1"
+                ],
+     "valid_exit_codes": [0,16]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "windows-shell",
+      "environment_vars": [
+                            "VAGRANT_USER={{user `vagrant_user`}}"
+                          ],
+      "scripts": [
+        "scripts/win/uac-enable.bat",
+        "scripts/win/enable-rdp.bat"
+      ]
+    }
+    ],
+   "post-processors" : [
+     {
+       "type": "vagrant",
+       "keep_input_artifact": false,
+       "output": "windows_2019_{{.Provider}}.box"
+     }
+    ]
+}
