@@ -29,7 +29,7 @@ function DockerRun {
   }
 
   Write-Host Run first container from $image ...
- # docker run --rm $image cmd
+  docker run --rm $image cmd
 }
 
 $images | foreach {

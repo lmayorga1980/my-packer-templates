@@ -1,6 +1,7 @@
 # use docker_provider:  "ee", "ce", "master" or ""
 $docker_provider = "ee"
-$docker_version = "18-09-6"
+$docker_version = "19-03-2"
+
 if (Test-Path env:docker_provider) {
   $docker_provider = $env:docker_provider  
 }
@@ -9,6 +10,7 @@ if (Test-Path env:docker_version) {
 }
 
 $ProgressPreference = 'SilentlyContinue'
+
 if ($docker_provider -eq "ce") {
   $zip_url = $("https://download.docker.com/win/static/edge/x86_64/docker-{0}-ce.zip" -f $docker_version)
 } elseif ($docker_provider -eq "ee") {

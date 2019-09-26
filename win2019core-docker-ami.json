@@ -1,16 +1,17 @@
 {
     "variables": {
       "admin_user": "Administrator",
-      "security_group_id": "{{env `AWS_SG_ID`}}",
-      "chocolatey_install_url": "{{env `CHOCO_INSTALL_URL`}}",
-      "docker_images": "microsoft/windowsservercore",
+      "security_group_id": "sg-02a17b934696f5e6e",
+      "chocolatey_install_url": "https://chocolatey.org/install.ps1",
+      "docker_images": "mcr.microsoft.com/windows/servercore:ltsc2019",
       "docker_provider": "ee",
-      "docker_version": "18-09-3"
+      "docker_version": "19-03-2"
     },
     "builders": [ {
       "type": "amazon-ebs",
-      "ami_name": "LM3_Windows_2019_Core_Base_Docker_2019_03_23",
-      "instance_type": "t2.medium",
+      "ami_name": "LM3_Windows_2019_Core_Base_Docker_2019_09_23",
+      "instance_type": "t2.xlarge",
+      "profile": "default",
       "region": "",
       "secret_key": "",
       "access_key": "",
@@ -31,7 +32,7 @@
           "LM3_Server_Type": "Core",
           "LM3_OS_Version": "2019",
           "LM3_OS_Name": "Windows 2019 Core",
-          "LM3_OS_Base_Software": "Docker, Git, Puppet, Chocolatey"
+          "LM3_OS_Base_Software": "Docker, Git, Chocolatey"
       },
       "user_data_file": "./ec2-userdata.ps1",
       "windows_password_timeout": "30m",
