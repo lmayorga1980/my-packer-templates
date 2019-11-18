@@ -1,6 +1,6 @@
 # use docker_provider:  "ee", "ce", "master" or ""
 $docker_provider = "ee"
-$docker_version = "19-03-2"
+$docker_version = "19-03-4"
 
 if (Test-Path env:docker_provider) {
   $docker_provider = $env:docker_provider  

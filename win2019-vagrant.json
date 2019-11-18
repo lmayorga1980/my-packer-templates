@@ -42,7 +42,52 @@
                       ["modifyvm","{{.Name}}","--vrdeaddress", "0.0.0.0" ],
                       ["modifyvm", "{{.Name}}", "--hardwareuuid", "02f110e7-369a-4bbc-bbe6-6f0b6864ccb6"  ]
                     ]
-        }
+      },
+      {
+        "type": "parallels-iso",
+        "iso_url": "{{user `iso_url`}}",
+        "communicator": "winrm",
+        "iso_checksum_type": "{{user `iso_checksum_type`}}",
+        "iso_checksum": "{{user `iso_checksum`}}",
+        "boot_wait": "3m",
+        "winrm_username": "{{user `vagrant_user`}}",
+        "winrm_password": "{{user `vagrant_password`}}",
+        "winrm_timeout": "6h",
+        "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+        "guest_os_type": "win-2019",
+        "parallels_tools_flavor": "win",
+        "disk_size": 61440,
+        "floppy_files": [
+                "http/win/2019/Autounattend.xml",
+                "scripts/win/disable-winrm.ps1",
+                "scripts/win/enable-winrm.ps1",
+                "scripts/win/microsoft-updates.bat",
+                "scripts/win/win-updates.ps1"
+        ],
+        "prlctl": [
+          [
+            "set", "{{.Name}}",
+            "--memsize", "4096"
+          ],
+          [
+            "set", "{{.Name}}",
+            "--cpus", "2"
+          ],
+          [
+            "set", "{{.Name}}",
+            "--winsystray-in-macmenu", "off"
+          ],
+          [
+            "set", "{{.Name}}",
+            "--startup-view", "window"
+          ],
+          [
+            "set", "{{.Name}}",
+            "--efi-boot", "off"
+          ]
+        ]
+      }
+
     ],
     "provisioners": [
     {
